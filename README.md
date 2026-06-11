@@ -25,6 +25,8 @@ mvn test
 ```
 
 ## Framework Structure
+
+```
 src/test/java/
 ├── pages/          # Page Object Model classes
 ├── steps/          # Cucumber step definitions
@@ -32,6 +34,7 @@ src/test/java/
 └── utils/          # WebDriver manager
 src/test/resources/
 └── features/       # Gherkin feature files
+```
 
 ## CI Pipeline
 Tests run automatically on every push to main via GitHub Actions.
