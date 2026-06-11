@@ -40,6 +40,8 @@ src/test/resources/
 Tests run automatically on every push to main via GitHub Actions.
 
 ## Save → push:
+```bash
 git add .
 git commit -m "Add README"
 git push origin main
+```
