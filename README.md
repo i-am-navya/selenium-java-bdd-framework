@@ -1,95 +1,118 @@
-# REST Assured API Testing Framework
+# Selenium Java BDD Framework
 
-![CI](https://github.com/i-am-navya/rest-assured-api-framework/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/i-am-navya/selenium-java-bdd-framework/actions/workflows/ci.yml/badge.svg)
 
-A REST API test automation framework built with REST Assured, Java, TestNG and Maven.
-Covers GET, POST, and nested resource endpoints with response validation,
-schema checks, response time assertions, and negative test cases.
+A UI test automation framework built with Selenium WebDriver, Java, Cucumber BDD and TestNG,
+using the Page Object Model. It tests the login, cart and checkout flows of
+[SauceDemo](https://www.saucedemo.com), a demo e-commerce site, with both positive and
+negative scenarios. Tests run automatically on every push and pull request through GitHub Actions.
 
 ## Tech Stack
 
 | Tool | Purpose |
 |---|---|
-| REST Assured 5.4 | API test automation |
-| Java 17 | Core language |
+| Selenium WebDriver 4.25 | Browser automation |
+| Cucumber 7.18 (Gherkin) | BDD feature files in plain English |
 | TestNG | Test execution and assertions |
+| Java 17 | Core language |
 | Maven | Build and dependency management |
-| Allure | Test reporting |
-| GitHub Actions CI | Automated pipeline on every push |
+| WebDriverManager | Sets up the matching ChromeDriver automatically |
+| Allure | Test reporting, with screenshots on failure |
+| GitHub Actions CI | Automated pipeline on every push and pull request |
 
 ## Test Coverage
 
-### GET Posts (7 tests)
-- Get all posts and verify count and structure
-- Get single post by ID
-- Get post with invalid ID - verify 404
-- Verify response time under 2 seconds
-- Filter posts by userId query parameter
-- Verify Content-Type response header
-- Validate response structure against a JSON schema
+### Login (3 scenarios)
+- Successful login with valid credentials
+- Failed login with invalid credentials - verify error message
+- Failed login with a locked out user - verify error message
 
-### POST - Create Posts (4 tests)
-- Create new post and verify 201 response
-- Create post with missing fields
-- Verify response time under 3 seconds
-- Extract and validate new post ID from response
+### Cart (3 scenarios)
+- Add item to cart - verify cart badge count
+- Remove item from cart - verify cart is empty
+- Navigate from cart to checkout
 
-### Users (6 tests)
-- Get all users and verify count and structure
-- Get single user by ID and verify fields
-- Verify email format across all users
-- Get user with invalid ID - verify 404
-- Verify nested address object fields
-- Get posts for a specific user
+### Checkout (3 scenarios)
+- Complete a successful purchase - verify confirmation message
+- Missing first name - verify validation error
+- Missing postal code - verify validation error
 
-**Total: 17 tests, 0 failures**
+**Total: 9 scenarios (5 positive, 4 negative)**
+
+## Framework Design
+
+- **Page Object Model:** one class per page holds its locators and actions, so a changed
+  locator is updated in one place only
+- **Stable locators:** `id` and `data-test` attributes, which do not change with UI redesigns
+- **Explicit waits:** `WebDriverWait` with `visibilityOfElementLocated` before reading text,
+  `elementToBeClickable` before clicking, and `urlContains` for page load checks.
+  No fixed sleeps in normal runs
+- **Independent scenarios:** a fresh browser is opened before each scenario and quit after it
+- **Screenshot on failure:** captured in the `@After` hook and attached to the Allure report
+- **Headless mode** for CI, and an optional slow mode for demos
 
 ## Framework Structure
 
 ```
 src/test/java/
-├── tests/
-│   ├── GetPostsTest.java       - GET endpoint tests
-│   ├── CreatePostTest.java     - POST endpoint tests
-│   └── UsersTest.java          - Users endpoint tests
+├── pages/                    # Page Object Model classes
+│   ├── LoginPage.java
+│   ├── InventoryPage.java
+│   ├── CartPage.java
+│   └── CheckoutPage.java
+├── steps/                    # Cucumber step definitions and hooks
+│   ├── LoginSteps.java
+│   ├── CartSteps.java
+│   ├── CheckoutSteps.java
+│   └── Hooks.java            # Browser setup/teardown, screenshot on failure
+├── runners/
+│   └── TestRunner.java       # Cucumber + TestNG runner
 └── utils/
-    └── ApiConfig.java          - Base configuration and reusable specs
-
+    └── DriverManager.java    # WebDriver setup, Chrome options, headless mode
 src/test/resources/
-└── schemas/
-    └── post-schema.json        - JSON schema for a single post
+└── features/                 # Gherkin feature files
+    ├── login.feature
+    ├── cart.feature
+    └── checkout.feature
 ```
 
 ## How to Run
 
 ### Prerequisites
 - Java 17
-- Maven 3.9+
+- Maven
+- Google Chrome
 
-### Clone and Run
-
+### Run all tests
 ```bash
-git clone https://github.com/i-am-navya/rest-assured-api-framework.git
-cd rest-assured-api-framework
+git clone https://github.com/i-am-navya/selenium-java-bdd-framework.git
+cd selenium-java-bdd-framework
 mvn test
 ```
 
-## API Under Test
+### Run in headless mode (no browser window)
+```bash
+mvn test -Dheadless=true
+```
 
-This framework tests [JSONPlaceholder](https://jsonplaceholder.typicode.com) -
-a free public REST API used for testing and prototyping. It simulates a real
-REST API with posts, users, comments, and nested resources.
+### Run in slow mode (pauses between steps, for demos)
+```bash
+mvn test -Dslow=true
+```
 
-## Design Patterns Used
+### View the Allure report
+```bash
+allure serve target/allure-results
+```
 
-- **Reusable Request/Response Specifications** - shared base config across all tests
-- **Given/When/Then BDD style** - readable, self-documenting test structure
-- **Negative testing** - invalid IDs, missing fields, boundary conditions
-- **Response time assertions** - performance validation on every endpoint
-- **Request/Response logging** - automatic logging on test failure
+## CI Pipeline
 
-## Author
+GitHub Actions runs the full suite on every push and pull request to `main`:
+1. Sets up Java 17 and Chrome on an Ubuntu runner
+2. Runs `mvn test -Dheadless=true`
+3. Uploads the Allure results as a build artifact, even when tests fail
 
-Navya Zacharia
-[LinkedIn](https://linkedin.com/in/navya-zacharia-0853621ba) |
-[GitHub](https://github.com/i-am-navya)
+## Planned Improvements
+- Scenario Outline with Examples tables for data-driven login tests
+- Tags (`@smoke`, `@regression`) to run subsets of the suite
+- ThreadLocal WebDriver to support parallel execution
