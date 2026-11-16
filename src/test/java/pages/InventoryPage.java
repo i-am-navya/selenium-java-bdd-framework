@@ -1,6 +1,7 @@
 package pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -47,6 +48,10 @@ public class InventoryPage {
     }
 
     public boolean isLoaded() {
-        return driver.getCurrentUrl().contains("inventory");
+        try {
+            return wait.until(ExpectedConditions.urlContains("inventory"));
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 }

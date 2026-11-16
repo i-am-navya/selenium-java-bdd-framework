@@ -52,6 +52,10 @@ public class CartPage {
     }
 
     public boolean isLoaded() {
-        return driver.getCurrentUrl().contains("cart");
+        try {
+            return wait.until(ExpectedConditions.urlContains("cart"));
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 }
