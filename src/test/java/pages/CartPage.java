@@ -1,6 +1,7 @@
 package pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -24,7 +25,13 @@ public class CartPage {
     }
 
     public boolean isItemPresent() {
-        return driver.findElements(cartItem).size() > 0;
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(3))
+                    .until(ExpectedConditions.visibilityOfElementLocated(cartItem));
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public String getItemName() {
