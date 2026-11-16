@@ -15,4 +15,8 @@ public class Hooks {
     public void tearDown() {
         DriverManager.quitDriver();
     }
+    @io.cucumber.java.AfterStep
+    public void slowDown() throws InterruptedException {
+        Thread.sleep(1500);   // 1.5 seconds after every step
+    }
 }

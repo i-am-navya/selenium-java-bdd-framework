@@ -30,20 +30,21 @@ public class CheckoutPage {
     }
 
     public void enterLastName(String lastName) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(lastNameField));
         driver.findElement(lastNameField).sendKeys(lastName);
     }
 
     public void enterPostalCode(String postalCode) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(postalCodeField));
         driver.findElement(postalCodeField).sendKeys(postalCode);
     }
 
     public void clickContinue() {
-        driver.findElement(continueButton).click();
+        wait.until(ExpectedConditions.elementToBeClickable(continueButton)).click();
     }
 
     public void clickFinish() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(finishButton));
-        driver.findElement(finishButton).click();
+        wait.until(ExpectedConditions.elementToBeClickable(finishButton)).click();
     }
 
     public String getConfirmationMessage() {

@@ -2,10 +2,14 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import java.time.Duration;
 
 public class CartPage {
 
     private WebDriver driver;
+    private WebDriverWait wait;
 
     // Locators
     private By cartItem = By.cssSelector(".cart_item");
@@ -16,6 +20,7 @@ public class CartPage {
 
     public CartPage(WebDriver driver) {
         this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
     public boolean isItemPresent() {
@@ -23,19 +28,20 @@ public class CartPage {
     }
 
     public String getItemName() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(itemName));
         return driver.findElement(itemName).getText();
     }
 
     public void removeItem() {
-        driver.findElement(removeButton).click();
+        wait.until(ExpectedConditions.elementToBeClickable(removeButton)).click();
     }
 
     public void clickCheckout() {
-        driver.findElement(checkoutButton).click();
+        wait.until(ExpectedConditions.elementToBeClickable(checkoutButton)).click();
     }
 
     public void continueShopping() {
-        driver.findElement(continueShoppingButton).click();
+        wait.until(ExpectedConditions.elementToBeClickable(continueShoppingButton)).click();
     }
 
     public boolean isLoaded() {
