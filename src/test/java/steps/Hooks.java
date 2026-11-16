@@ -1,6 +1,7 @@
 package steps;
 
 import io.cucumber.java.After;
+import io.cucumber.java.AfterStep;
 import io.cucumber.java.Before;
 import utils.DriverManager;
 
@@ -15,8 +16,12 @@ public class Hooks {
     public void tearDown() {
         DriverManager.quitDriver();
     }
-    @io.cucumber.java.AfterStep
+
+    // Only pauses when run with -Dslow=true (for demos); CI stays fast
+    @AfterStep
     public void slowDown() throws InterruptedException {
-        Thread.sleep(1500);   // 1.5 seconds after every step
+        if (System.getProperty("slow") != null) {
+            Thread.sleep(1500);
+        }
     }
 }
